@@ -5,254 +5,248 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Computer Networks Lab – Socket Programming in C</title>
 <style>
-  body {
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #0d1117;
-    color: #e6edf3;
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
+  :root {
+    --bg: #0d1117;
+    --text: #e6edf3;
+    --accent: #58a6ff;
+    --muted: #8b949e;
+    --border: #30363d;
+    --code-bg: #161b22;
   }
 
-  .container {
-    max-width: 900px;
-    margin: 0 auto;
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", Roboto, sans-serif;
+    line-height: 1.6;
     padding: 2rem;
   }
 
   h1, h2, h3 {
-    color: #58a6ff;
+    color: var(--accent);
+    margin-top: 2rem;
   }
 
   h1 {
-    text-align: center;
-    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 0.5rem;
   }
 
-  p, li {
-    line-height: 1.6;
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2rem 0;
+  }
+
+  ul, ol {
+    padding-left: 1.5rem;
   }
 
   code {
-    background-color: #161b22;
+    background-color: var(--code-bg);
     color: #79c0ff;
-    padding: 2px 5px;
-    border-radius: 5px;
-    font-family: monospace;
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-family: Consolas, monospace;
+    font-size: 0.95em;
   }
 
   pre {
-    background-color: #161b22;
+    background-color: var(--code-bg);
     padding: 1rem;
-    border-radius: 10px;
+    border-radius: 6px;
     overflow-x: auto;
+    border: 1px solid var(--border);
   }
 
   table {
     width: 100%;
     border-collapse: collapse;
-    margin: 1rem 0;
-    background-color: #161b22;
+    margin-top: 1rem;
+    border: 1px solid var(--border);
   }
 
   th, td {
-    border: 1px solid #30363d;
-    padding: 10px;
+    border: 1px solid var(--border);
+    padding: 0.75rem;
     text-align: left;
   }
 
   th {
-    background-color: #21262d;
-  }
-
-  hr {
-    border: 0;
-    height: 1px;
-    background-color: #30363d;
-    margin: 2rem 0;
-  }
-
-  details {
     background-color: #161b22;
-    border-radius: 10px;
-    margin: 1rem 0;
-    padding: 1rem;
+    color: var(--accent);
   }
 
-  summary {
-    font-weight: bold;
-    cursor: pointer;
-    color: #58a6ff;
+  tr:nth-child(even) {
+    background-color: #0f141a;
   }
 
-  summary:hover {
+  em {
+    color: var(--muted);
+  }
+
+  ::selection {
+    background-color: var(--accent);
+    color: #fff;
+  }
+
+  a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  a:hover {
     text-decoration: underline;
-  }
-
-  .footer {
-    text-align: center;
-    font-size: 0.9rem;
-    color: #8b949e;
-    padding: 2rem 0;
   }
 </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🖧 Computer Networks Lab – Socket Programming in C</h1>
-    <p>This repository contains C programs and algorithms for fundamental networking experiments using TCP, UDP, and reliable data transfer protocols (Stop-and-Wait, Go-Back-N, Selective Repeat).</p>
+  <h1>🖧 Computer Networks Lab – Socket Programming in C</h1>
 
-    <hr>
+  <p>This repository contains C programs and algorithms for fundamental networking experiments using TCP, UDP, and reliable data transfer protocols (Stop-and-Wait, Go-Back-N, Selective Repeat).</p>
 
-    <h2>📘 List of Programs</h2>
-    <ul>
-      <li>TCP Socket Programming</li>
-      <li>UDP Socket Programming</li>
-      <li>Stop and Wait ARQ (UDP)</li>
-      <li>Go-Back-N ARQ (UDP)</li>
-      <li>Selective Repeat ARQ (UDP)</li>
-    </ul>
+  <hr>
 
-    <hr>
+  <h2>📘 List of Programs</h2>
+  <ol>
+    <li><b>TCP Socket Programming</b></li>
+    <li><b>UDP Socket Programming</b></li>
+    <li><b>Stop and Wait ARQ (UDP)</b></li>
+    <li><b>Go-Back-N ARQ (UDP)</b></li>
+    <li><b>Selective Repeat ARQ (UDP)</b></li>
+  </ol>
 
-    <details open>
-      <summary>🧩 1. TCP Program</summary>
-      <h3>Algorithm – TCP Server</h3>
-      <ol>
-        <li>Start the program.</li>
-        <li>Create a socket using <code>socket(AF_INET, SOCK_STREAM, 0)</code>.</li>
-        <li>Assign server IP and port number to <code>sockaddr_in</code>.</li>
-        <li>Bind the socket using <code>bind()</code>.</li>
-        <li>Listen for connections using <code>listen()</code>.</li>
-        <li>Accept connection using <code>accept()</code>.</li>
-        <li>Receive message using <code>recv()</code>.</li>
-        <li>Send response using <code>send()</code>.</li>
-        <li>Close the connection using <code>close()</code>.</li>
-      </ol>
+  <hr>
 
-      <h3>Algorithm – TCP Client</h3>
-      <ol>
-        <li>Start the program.</li>
-        <li>Create socket using <code>socket(AF_INET, SOCK_STREAM, 0)</code>.</li>
-        <li>Assign server IP and port using <code>sockaddr_in</code>.</li>
-        <li>Connect using <code>connect()</code>.</li>
-        <li>Send message using <code>send()</code>.</li>
-        <li>Receive response using <code>recv()</code>.</li>
-        <li>Close socket using <code>close()</code>.</li>
-      </ol>
-    </details>
+  <h2>🧩 1. TCP Program</h2>
+  <h3>Algorithm – TCP Server</h3>
+  <ol>
+    <li>Start the program.</li>
+    <li>Create a socket using <code>socket(AF_INET, SOCK_STREAM, 0)</code>.</li>
+    <li>Assign server IP and port number to a structure (<code>sockaddr_in</code>).</li>
+    <li>Bind the socket using <code>bind()</code>.</li>
+    <li>Listen for incoming connections using <code>listen()</code>.</li>
+    <li>Accept connection from client using <code>accept()</code>.</li>
+    <li>Receive message from client using <code>recv()</code>.</li>
+    <li>Process or display the message.</li>
+    <li>Send response to client using <code>send()</code>.</li>
+    <li>Close the connection using <code>close()</code>.</li>
+    <li>Stop.</li>
+  </ol>
 
-    <details>
-      <summary>🧩 2. UDP Program</summary>
-      <h3>Algorithm – UDP Server</h3>
-      <ol>
-        <li>Create socket using <code>socket(AF_INET, SOCK_DGRAM, 0)</code>.</li>
-        <li>Bind using <code>bind()</code>.</li>
-        <li>Receive message with <code>recvfrom()</code>.</li>
-        <li>Send response with <code>sendto()</code>.</li>
-        <li>Close socket.</li>
-      </ol>
+  <h3>Algorithm – TCP Client</h3>
+  <ol>
+    <li>Start the program.</li>
+    <li>Create socket using <code>socket(AF_INET, SOCK_STREAM, 0)</code>.</li>
+    <li>Assign server IP and port number to structure (<code>sockaddr_in</code>).</li>
+    <li>Establish connection to server using <code>connect()</code>.</li>
+    <li>Send message to server using <code>send()</code>.</li>
+    <li>Receive response from server using <code>recv()</code>.</li>
+    <li>Display the message.</li>
+    <li>Close socket using <code>close()</code>.</li>
+    <li>Stop.</li>
+  </ol>
 
-      <h3>Algorithm – UDP Client</h3>
-      <ol>
-        <li>Create socket using <code>socket(AF_INET, SOCK_DGRAM, 0)</code>.</li>
-        <li>Send message using <code>sendto()</code>.</li>
-        <li>Receive response using <code>recvfrom()</code>.</li>
-        <li>Close socket.</li>
-      </ol>
-    </details>
+  <hr>
 
-    <details>
-      <summary>🧩 3. Stop-and-Wait ARQ (UDP)</summary>
-      <p><i>Reliable data transfer over UDP — send one frame, wait for ACK before sending the next.</i></p>
+  <h2>🧩 2. UDP Program</h2>
+  <h3>Algorithm – UDP Server</h3>
+  <ol>
+    <li>Start.</li>
+    <li>Create socket using <code>socket(AF_INET, SOCK_DGRAM, 0)</code>.</li>
+    <li>Assign server IP and port number using <code>sockaddr_in</code>.</li>
+    <li>Bind socket to address using <code>bind()</code>.</li>
+    <li>Receive message from client using <code>recvfrom()</code>.</li>
+    <li>Process and display the message.</li>
+    <li>Send response to client using <code>sendto()</code>.</li>
+    <li>Close socket.</li>
+    <li>Stop.</li>
+  </ol>
 
-      <h3>Algorithm – Sender</h3>
-      <ol>
-        <li>Create UDP socket.</li>
-        <li>Initialize sequence number = 0.</li>
-        <li>Send frame using <code>sendto()</code>.</li>
-        <li>Wait for ACK with timeout.</li>
-        <li>Retransmit if timeout or wrong ACK.</li>
-      </ol>
+  <h3>Algorithm – UDP Client</h3>
+  <ol>
+    <li>Start.</li>
+    <li>Create socket using <code>socket(AF_INET, SOCK_DGRAM, 0)</code>.</li>
+    <li>Assign server IP and port number using <code>sockaddr_in</code>.</li>
+    <li>Send message to server using <code>sendto()</code>.</li>
+    <li>Receive response using <code>recvfrom()</code>.</li>
+    <li>Display message.</li>
+    <li>Close socket.</li>
+    <li>Stop.</li>
+  </ol>
 
-      <h3>Algorithm – Receiver</h3>
-      <ol>
-        <li>Create UDP socket and bind it.</li>
-        <li>Receive frame using <code>recvfrom()</code>.</li>
-        <li>Send ACK for correct frame.</li>
-        <li>Resend last ACK for duplicate frames.</li>
-      </ol>
-    </details>
+  <hr>
 
-    <details>
-      <summary>🧩 4. Go-Back-N ARQ (UDP)</summary>
-      <p><i>Sender sends multiple frames before waiting for ACK; receiver only accepts in-order frames.</i></p>
+  <h2>🧩 3. Stop-and-Wait ARQ (UDP)</h2>
+  <em>Reliable data transfer over UDP — send one frame, wait for ACK before sending the next.</em>
 
-      <h3>Algorithm – Sender</h3>
-      <ol>
-        <li>Set window size N.</li>
-        <li>Send N frames without waiting.</li>
-        <li>Wait for ACKs and slide window.</li>
-        <li>Retransmit on timeout.</li>
-      </ol>
+  <h3>Algorithm – Sender</h3>
+  <ol>
+    <li>Start.</li>
+    <li>Create UDP socket.</li>
+    <li>Initialize sequence number = 0.</li>
+    <li>Read data frame from user.</li>
+    <li>Send frame to receiver using <code>sendto()</code>.</li>
+    <li>Wait for ACK with a timeout:
+      <ul>
+        <li>If ACK received and correct → toggle sequence number and send next frame.</li>
+        <li>If timeout or wrong ACK → retransmit the same frame.</li>
+      </ul>
+    </li>
+    <li>Repeat until all frames are sent.</li>
+    <li>Close socket.</li>
+    <li>Stop.</li>
+  </ol>
 
-      <h3>Algorithm – Receiver</h3>
-      <ol>
-        <li>Receive frame and verify sequence.</li>
-        <li>Send ACK for correct frame.</li>
-        <li>Discard out-of-order frames.</li>
-      </ol>
-    </details>
+  <h3>Algorithm – Receiver</h3>
+  <ol>
+    <li>Start.</li>
+    <li>Create UDP socket and bind it.</li>
+    <li>Wait for data frame using <code>recvfrom()</code>.</li>
+    <li>If received frame has expected sequence number →
+      <ul>
+        <li>Display data.</li>
+        <li>Send ACK for that sequence number.</li>
+        <li>Toggle expected sequence number.</li>
+      </ul>
+    </li>
+    <li>Else (duplicate frame) → resend previous ACK.</li>
+    <li>Repeat until all frames are received.</li>
+    <li>Close socket.</li>
+    <li>Stop.</li>
+  </ol>
 
-    <details>
-      <summary>🧩 5. Selective Repeat ARQ (UDP)</summary>
-      <p><i>Multiple frames sent; only erroneous frames are retransmitted.</i></p>
+  <hr>
 
-      <h3>Algorithm – Sender</h3>
-      <ol>
-        <li>Set window size N.</li>
-        <li>Send frames and start timers.</li>
-        <li>Slide window when ACK received.</li>
-        <li>Retransmit only lost frames.</li>
-      </ol>
+  <h2>⚙️ Important Functions</h2>
+  <table>
+    <tr><th>Function</th><th>Purpose</th></tr>
+    <tr><td><code>socket()</code></td><td>Creates communication endpoint</td></tr>
+    <tr><td><code>bind()</code></td><td>Assigns IP address and port to socket</td></tr>
+    <tr><td><code>listen()</code></td><td>Prepares server socket for connections</td></tr>
+    <tr><td><code>accept()</code></td><td>Accepts incoming client connection</td></tr>
+    <tr><td><code>connect()</code></td><td>Establishes client connection to server</td></tr>
+    <tr><td><code>send()</code> / <code>recv()</code></td><td>Send/receive data over TCP</td></tr>
+    <tr><td><code>sendto()</code> / <code>recvfrom()</code></td><td>Send/receive data over UDP</td></tr>
+    <tr><td><code>close()</code></td><td>Closes socket connection</td></tr>
+    <tr><td><code>setsockopt()</code></td><td>Set socket options (timeouts, reuse, etc.)</td></tr>
+    <tr><td><code>htons()</code> / <code>htonl()</code></td><td>Convert to network byte order</td></tr>
+    <tr><td><code>inet_pton()</code> / <code>inet_ntoa()</code></td><td>Convert between text and binary IP</td></tr>
+  </table>
 
-      <h3>Algorithm – Receiver</h3>
-      <ol>
-        <li>Receive and buffer in-window frames.</li>
-        <li>Send ACK for each frame.</li>
-        <li>Deliver frames in order.</li>
-      </ol>
-    </details>
+  <hr>
 
-    <hr>
-
-    <h2>⚙️ Important Functions</h2>
-    <table>
-      <tr><th>Function</th><th>Purpose</th></tr>
-      <tr><td><code>socket()</code></td><td>Creates communication endpoint</td></tr>
-      <tr><td><code>bind()</code></td><td>Assigns IP and port to socket</td></tr>
-      <tr><td><code>listen()</code></td><td>Prepares server socket for connections</td></tr>
-      <tr><td><code>accept()</code></td><td>Accepts client connection</td></tr>
-      <tr><td><code>connect()</code></td><td>Connects client to server</td></tr>
-      <tr><td><code>send()</code> / <code>recv()</code></td><td>Send/receive data (TCP)</td></tr>
-      <tr><td><code>sendto()</code> / <code>recvfrom()</code></td><td>Send/receive data (UDP)</td></tr>
-      <tr><td><code>close()</code></td><td>Closes socket</td></tr>
-      <tr><td><code>setsockopt()</code></td><td>Set socket options</td></tr>
-      <tr><td><code>htons()</code> / <code>htonl()</code></td><td>Convert to network byte order</td></tr>
-    </table>
-
-    <hr>
-
-    <h2>🧠 Common Header Files</h2>
-<pre><code>#include &lt;stdio.h&gt;
+  <h2>🧠 Common Header Files</h2>
+  <pre><code>#include &lt;stdio.h&gt;
 #include &lt;stdlib.h&gt;
 #include &lt;string.h&gt;
 #include &lt;unistd.h&gt;
 #include &lt;arpa/inet.h&gt;
-#include &lt;time.h&gt;
-</code></pre>
-
-    <div class="footer">© Computer Networks Lab – Socket Programming in C</div>
-  </div>
+#include &lt;time.h&gt;</code></pre>
 </body>
 </html>
