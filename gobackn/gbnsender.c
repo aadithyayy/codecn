@@ -9,7 +9,7 @@
 #define TOTAL_FRAMES 7
 
 int main() {
-    int sockfd, base = 0, nextseq = 0;
+    int sockfd, base = 1, nextseq = 1;  // start from Frame 1
     struct sockaddr_in rec;
     char *frames[] = {"Frame 1", "Frame 2", "Frame 3", "Frame 4", "Frame 5", "Frame 6", "Frame 7"};
     char ack[10];
@@ -25,22 +25,25 @@ int main() {
 
     printf("Go-Back-N Sender started...\n");
 
-    while (base < TOTAL_FRAMES) {
-        // Send frames within the window
-        while (nextseq < base + WINDOW_SIZE && nextseq < TOTAL_FRAMES) {
-            sendto(sockfd, frames[nextseq], strlen(frames[nextseq]) + 1, 0, (struct sockaddr*)&rec, len);
-            printf("Sent: %s\n", frames[nextseq]);
+    while (base <= TOTAL_FRAMES) {
+        // Send frames within window
+        while (nextseq < base + WINDOW_SIZE && nextseq <= TOTAL_FRAMES) {
+            sendto(sockfd, frames[nextseq - 1], strlen(frames[nextseq - 1]) + 1, 0, (struct sockaddr*)&rec, len);
+            printf("Sent: %s\n", frames[nextseq - 1]);
             nextseq++;
         }
 
         int n = recvfrom(sockfd, ack, sizeof(ack), 0, (struct sockaddr*)&rec, &len);
         if (n > 0 && strstr(ack, "ACK")) {
-            int ackno = atoi(ack + 3); // extract ACK number
-            printf("ACK received for Frame %d\n\n", ackno);
-            base = ackno; // slide window
+            int ackno = atoi(ack + 3); // parse ACKx (no space)
+            printf("Received %s (ACK for Frame %d)\n\n", ack, ackno);
+
+            // Slide window
+            if (ackno >= base)
+                base = ackno + 1;
         } else {
-            printf("Timeout! Resending from Frame %d\n\n", base + 1);
-            nextseq = base; // resend from base
+            printf("Timeout! Resending from Frame %d\n\n", base);
+            nextseq = base; // resend all unacknowledged frames
         }
     }
 
