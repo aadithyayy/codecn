@@ -1,252 +1,440 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Computer Networks Lab – Socket Programming in C</title>
-<style>
-  :root {
-    --bg: #0d1117;
-    --text: #e6edf3;
-    --accent: #58a6ff;
-    --muted: #8b949e;
-    --border: #30363d;
-    --code-bg: #161b22;
-  }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Computer Networks Lab — Socket Programming in C</title>
+  <style>
+    :root{
+      --bg:#0f1720;
+      --card:#0b1220;
+      --muted:#9aa4b2;
+      --accent:#0d72b9;
+      --white:#ffffff;
+      --glass: rgba(255,255,255,0.03);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", "Courier New", monospace;
+    }
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg, var(--bg) 0%, #07101a 100%);
+      color:var(--white);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.5;
+      padding:32px;
+    }
 
-  * {
-    box-sizing: border-box;
-  }
+    .container{
+      max-width:980px;
+      margin:0 auto;
+    }
 
-  body {
-    margin: 0;
-    background-color: var(--bg);
-    color: var(--text);
-    font-family: "Segoe UI", Roboto, sans-serif;
-    line-height: 1.6;
-    padding: 2rem;
-  }
+    header{
+      display:flex;
+      gap:16px;
+      align-items:center;
+      margin-bottom:20px;
+    }
+    .logo{
+      width:72px;
+      height:72px;
+      display:grid;
+      place-items:center;
+      font-size:28px;
+      background:linear-gradient(135deg,var(--accent),#0a9ee0);
+      border-radius:10px;
+      box-shadow: 0 6px 18px rgba(13,114,185,0.18);
+    }
+    h1{font-size:20px;margin:0;}
+    p.lead{margin:6px 0 0;color:var(--muted)}
 
-  h1, h2, h3 {
-    color: var(--accent);
-    margin-top: 2rem;
-  }
+    nav.toc{
+      margin:18px 0 26px;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    nav.toc a{
+      text-decoration:none;
+      color:var(--accent);
+      background:var(--glass);
+      padding:8px 12px;
+      border-radius:8px;
+      font-size:14px;
+      border:1px solid rgba(255,255,255,0.03);
+    }
 
-  h1 {
-    border-bottom: 2px solid var(--border);
-    padding-bottom: 0.5rem;
-  }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:12px;
+      padding:18px;
+      margin-bottom:18px;
+      box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+      border:1px solid rgba(255,255,255,0.03);
+    }
 
-  hr {
-    border: none;
-    border-top: 1px solid var(--border);
-    margin: 2rem 0;
-  }
+    h2{margin:0 0 10px 0;font-size:16px}
+    h3{margin:12px 0 8px 0;font-size:15px}
+    hr.sep{
+      border:0;height:1px;background:linear-gradient(90deg,transparent,var(--glass),transparent);
+      margin:16px 0;
+    }
 
-  ul, ol {
-    padding-left: 1.5rem;
-  }
+    ol, ul {margin:8px 0 12px 20px}
+    pre{
+      background: #071122;
+      border-radius:8px;
+      padding:12px;
+      overflow:auto;
+      font-family: var(--mono);
+      font-size:13px;
+      line-height:1.45;
+      margin:12px 0;
+      border:1px solid rgba(255,255,255,0.03);
+    }
+    code.inline {background: rgba(255,255,255,0.03); padding:2px 6px; border-radius:6px; font-family:var(--mono); font-size:13px;}
 
-  code {
-    background-color: var(--code-bg);
-    color: #79c0ff;
-    padding: 0.15rem 0.4rem;
-    border-radius: 4px;
-    font-family: Consolas, monospace;
-    font-size: 0.95em;
-  }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:14px;
+      margin-top:12px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
+      border-radius:8px;
+      overflow:hidden;
+    }
+    thead th{
+      text-align:left;
+      padding:10px 12px;
+      background: rgba(255,255,255,0.02);
+      color:var(--muted);
+      font-weight:600;
+      font-size:13px;
+    }
+    tbody td{
+      padding:12px;
+      border-top:1px solid rgba(255,255,255,0.02);
+    }
 
-  pre {
-    background-color: var(--code-bg);
-    padding: 1rem;
-    border-radius: 6px;
-    overflow-x: auto;
-    border: 1px solid var(--border);
-  }
+    .footer {
+      margin-top:22px;
+      color:var(--muted);
+      font-size:13px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1rem;
-    border: 1px solid var(--border);
-  }
-
-  th, td {
-    border: 1px solid var(--border);
-    padding: 0.75rem;
-    text-align: left;
-  }
-
-  th {
-    background-color: #161b22;
-    color: var(--accent);
-  }
-
-  tr:nth-child(even) {
-    background-color: #0f141a;
-  }
-
-  em {
-    color: var(--muted);
-  }
-
-  ::selection {
-    background-color: var(--accent);
-    color: #fff;
-  }
-
-  a {
-    color: var(--accent);
-    text-decoration: none;
-  }
-
-  a:hover {
-    text-decoration: underline;
-  }
-</style>
+    /* small screens */
+    @media (max-width:640px){
+      body{padding:18px}
+      .logo{width:56px;height:56px;font-size:22px}
+      h1{font-size:18px}
+    }
+  </style>
 </head>
 <body>
-  <h1>🖧 Computer Networks Lab – Socket Programming in C</h1>
+  <div class="container">
+    <header>
+      <div class="logo">🖧</div>
+      <div>
+        <h1>Computer Networks Lab – Socket Programming in C</h1>
+        <p class="lead">C programs and algorithms for TCP, UDP and ARQ (Stop-and-Wait, GBN, Selective Repeat)</p>
+      </div>
+    </header>
 
-  <p>This repository contains C programs and algorithms for fundamental networking experiments using TCP, UDP, and reliable data transfer protocols (Stop-and-Wait, Go-Back-N, Selective Repeat).</p>
+    <nav class="toc" aria-label="Table of contents">
+      <a href="#list">List of Programs</a>
+      <a href="#tcp">TCP Program</a>
+      <a href="#udp">UDP Program</a>
+      <a href="#stopwait">Stop-and-Wait</a>
+      <a href="#gbn">Go-Back-N</a>
+      <a href="#sr">Selective Repeat</a>
+      <a href="#functions">Important Functions</a>
+      <a href="#keypoints">Key Points</a>
+      <a href="#headers">Common Header Files</a>
+    </nav>
 
-  <hr>
+    <section id="list" class="card">
+      <h2>📘 List of Programs</h2>
+      <ol>
+        <li><strong>TCP Socket Programming</strong></li>
+        <li><strong>UDP Socket Programming</strong></li>
+        <li><strong>Stop and Wait ARQ (UDP)</strong></li>
+        <li><strong>Go-Back-N ARQ (UDP)</strong></li>
+        <li><strong>Selective Repeat ARQ (UDP)</strong></li>
+      </ol>
+    </section>
 
-  <h2>📘 List of Programs</h2>
-  <ol>
-    <li><b>TCP Socket Programming</b></li>
-    <li><b>UDP Socket Programming</b></li>
-    <li><b>Stop and Wait ARQ (UDP)</b></li>
-    <li><b>Go-Back-N ARQ (UDP)</b></li>
-    <li><b>Selective Repeat ARQ (UDP)</b></li>
-  </ol>
+    <hr class="sep" />
 
-  <hr>
+    <section id="tcp" class="card">
+      <h2>🧩 1. TCP Program</h2>
 
-  <h2>🧩 1. TCP Program</h2>
-  <h3>Algorithm – TCP Server</h3>
-  <ol>
-    <li>Start the program.</li>
-    <li>Create a socket using <code>socket(AF_INET, SOCK_STREAM, 0)</code>.</li>
-    <li>Assign server IP and port number to a structure (<code>sockaddr_in</code>).</li>
-    <li>Bind the socket using <code>bind()</code>.</li>
-    <li>Listen for incoming connections using <code>listen()</code>.</li>
-    <li>Accept connection from client using <code>accept()</code>.</li>
-    <li>Receive message from client using <code>recv()</code>.</li>
-    <li>Process or display the message.</li>
-    <li>Send response to client using <code>send()</code>.</li>
-    <li>Close the connection using <code>close()</code>.</li>
-    <li>Stop.</li>
-  </ol>
+      <h3>Algorithm – TCP Server</h3>
+      <ol>
+        <li>Start the program.</li>
+        <li>Create a socket using <code class="inline">socket(AF_INET, SOCK_STREAM, 0)</code>.</li>
+        <li>Assign server IP and port number to a structure (<code class="inline">struct sockaddr_in</code>).</li>
+        <li>Bind the socket using <code class="inline">bind()</code>.</li>
+        <li>Listen for incoming connections using <code class="inline">listen()</code>.</li>
+        <li>Accept connection from client using <code class="inline">accept()</code>.</li>
+        <li>Receive message from client using <code class="inline">recv()</code>.</li>
+        <li>Process or display the message.</li>
+        <li>Send response to client using <code class="inline">send()</code>.</li>
+        <li>Close the connection using <code class="inline">close()</code>.</li>
+        <li>Stop.</li>
+      </ol>
 
-  <h3>Algorithm – TCP Client</h3>
-  <ol>
-    <li>Start the program.</li>
-    <li>Create socket using <code>socket(AF_INET, SOCK_STREAM, 0)</code>.</li>
-    <li>Assign server IP and port number to structure (<code>sockaddr_in</code>).</li>
-    <li>Establish connection to server using <code>connect()</code>.</li>
-    <li>Send message to server using <code>send()</code>.</li>
-    <li>Receive response from server using <code>recv()</code>.</li>
-    <li>Display the message.</li>
-    <li>Close socket using <code>close()</code>.</li>
-    <li>Stop.</li>
-  </ol>
+      <h3>Algorithm – TCP Client</h3>
+      <ol>
+        <li>Start the program.</li>
+        <li>Create socket using <code class="inline">socket(AF_INET, SOCK_STREAM, 0)</code>.</li>
+        <li>Assign server IP and port number to structure (<code class="inline">struct sockaddr_in</code>).</li>
+        <li>Establish connection to server using <code class="inline">connect()</code>.</li>
+        <li>Send message to server using <code class="inline">send()</code>.</li>
+        <li>Receive response from server using <code class="inline">recv()</code>.</li>
+        <li>Display the message.</li>
+        <li>Close socket using <code class="inline">close()</code>.</li>
+        <li>Stop.</li>
+      </ol>
+    </section>
 
-  <hr>
+    <section id="udp" class="card">
+      <h2>🧩 2. UDP Program</h2>
 
-  <h2>🧩 2. UDP Program</h2>
-  <h3>Algorithm – UDP Server</h3>
-  <ol>
-    <li>Start.</li>
-    <li>Create socket using <code>socket(AF_INET, SOCK_DGRAM, 0)</code>.</li>
-    <li>Assign server IP and port number using <code>sockaddr_in</code>.</li>
-    <li>Bind socket to address using <code>bind()</code>.</li>
-    <li>Receive message from client using <code>recvfrom()</code>.</li>
-    <li>Process and display the message.</li>
-    <li>Send response to client using <code>sendto()</code>.</li>
-    <li>Close socket.</li>
-    <li>Stop.</li>
-  </ol>
+      <h3>Algorithm – UDP Server</h3>
+      <ol>
+        <li>Start.</li>
+        <li>Create socket using <code class="inline">socket(AF_INET, SOCK_DGRAM, 0)</code>.</li>
+        <li>Assign server IP and port number using <code class="inline">struct sockaddr_in</code>.</li>
+        <li>Bind socket to address using <code class="inline">bind()</code>.</li>
+        <li>Receive message from client using <code class="inline">recvfrom()</code>.</li>
+        <li>Process and display the message.</li>
+        <li>Send response to client using <code class="inline">sendto()</code>.</li>
+        <li>Close socket.</li>
+        <li>Stop.</li>
+      </ol>
 
-  <h3>Algorithm – UDP Client</h3>
-  <ol>
-    <li>Start.</li>
-    <li>Create socket using <code>socket(AF_INET, SOCK_DGRAM, 0)</code>.</li>
-    <li>Assign server IP and port number using <code>sockaddr_in</code>.</li>
-    <li>Send message to server using <code>sendto()</code>.</li>
-    <li>Receive response using <code>recvfrom()</code>.</li>
-    <li>Display message.</li>
-    <li>Close socket.</li>
-    <li>Stop.</li>
-  </ol>
+      <h3>Algorithm – UDP Client</h3>
+      <ol>
+        <li>Start.</li>
+        <li>Create socket using <code class="inline">socket(AF_INET, SOCK_DGRAM, 0)</code>.</li>
+        <li>Assign server IP and port number using <code class="inline">struct sockaddr_in</code>.</li>
+        <li>Send message to server using <code class="inline">sendto()</code>.</li>
+        <li>Receive response using <code class="inline">recvfrom()</code>.</li>
+        <li>Display message.</li>
+        <li>Close socket.</li>
+        <li>Stop.</li>
+      </ol>
+    </section>
 
-  <hr>
+    <section id="stopwait" class="card">
+      <h2>🧩 3. Stop-and-Wait ARQ (UDP)</h2>
+      <p><em>Reliable data transfer over UDP — send one frame, wait for ACK before sending the next.</em></p>
 
-  <h2>🧩 3. Stop-and-Wait ARQ (UDP)</h2>
-  <em>Reliable data transfer over UDP — send one frame, wait for ACK before sending the next.</em>
+      <h3>Algorithm – Sender</h3>
+      <ol>
+        <li>Start.</li>
+        <li>Create UDP socket.</li>
+        <li>Initialize sequence number = 0.</li>
+        <li>Read data frame from user.</li>
+        <li>Send frame to receiver using <code class="inline">sendto()</code>.</li>
+        <li>Wait for ACK with a timeout:
+          <ul>
+            <li>If ACK received and correct → toggle sequence number and send next frame.</li>
+            <li>If timeout or wrong ACK → retransmit the same frame.</li>
+          </ul>
+        </li>
+        <li>Repeat until all frames are sent.</li>
+        <li>Close socket.</li>
+        <li>Stop.</li>
+      </ol>
 
-  <h3>Algorithm – Sender</h3>
-  <ol>
-    <li>Start.</li>
-    <li>Create UDP socket.</li>
-    <li>Initialize sequence number = 0.</li>
-    <li>Read data frame from user.</li>
-    <li>Send frame to receiver using <code>sendto()</code>.</li>
-    <li>Wait for ACK with a timeout:
+      <h3>Algorithm – Receiver</h3>
+      <ol>
+        <li>Start.</li>
+        <li>Create UDP socket and bind it.</li>
+        <li>Wait for data frame using <code class="inline">recvfrom()</code>.</li>
+        <li>If received frame has expected sequence number:
+          <ul>
+            <li>Display data.</li>
+            <li>Send ACK for that sequence number.</li>
+            <li>Toggle expected sequence number.</li>
+          </ul>
+        </li>
+        <li>Else (duplicate frame) → resend previous ACK.</li>
+        <li>Repeat until all frames are received.</li>
+        <li>Close socket.</li>
+        <li>Stop.</li>
+      </ol>
+    </section>
+
+    <section id="gbn" class="card">
+      <h2>🧩 4. Go-Back-N ARQ (UDP)</h2>
+      <p><em>Sender sends multiple frames before waiting for ACK; receiver only accepts in-order frames.</em></p>
+
+      <h3>Algorithm – Sender</h3>
+      <ol>
+        <li>Start.</li>
+        <li>Create UDP socket.</li>
+        <li>Set <strong>window size N</strong>.</li>
+        <li>Read and prepare data frames.</li>
+        <li>Send up to N frames sequentially (without waiting).</li>
+        <li>Wait for ACKs:
+          <ul>
+            <li>If ACK for oldest frame received → slide window and send next frame.</li>
+            <li>If timeout occurs → retransmit all frames in current window.</li>
+          </ul>
+        </li>
+        <li>Repeat until all frames are acknowledged.</li>
+        <li>Close socket.</li>
+        <li>Stop.</li>
+      </ol>
+
+      <h3>Algorithm – Receiver</h3>
+      <ol>
+        <li>Start.</li>
+        <li>Create and bind UDP socket.</li>
+        <li>Expect sequence number = 0.</li>
+        <li>Receive frame:
+          <ul>
+            <li>If correct → display data, send ACK for next expected frame.</li>
+            <li>If incorrect (out of order) → discard frame and resend last ACK.</li>
+          </ul>
+        </li>
+        <li>Repeat until all frames are received.</li>
+        <li>Close socket.</li>
+        <li>Stop.</li>
+      </ol>
+    </section>
+
+    <section id="sr" class="card">
+      <h2>🧩 5. Selective Repeat ARQ (UDP)</h2>
+      <p><em>Multiple frames sent; only erroneous frames are retransmitted.</em></p>
+
+      <h3>Algorithm – Sender</h3>
+      <ol>
+        <li>Start.</li>
+        <li>Create UDP socket.</li>
+        <li>Set <strong>window size N</strong>.</li>
+        <li>Send frames within window.</li>
+        <li>Start individual timer for each frame.</li>
+        <li>For each ACK received:
+          <ul>
+            <li>Mark frame as received and slide window forward.</li>
+          </ul>
+        </li>
+        <li>If timeout occurs for any frame → retransmit only that frame.</li>
+        <li>Repeat until all frames are acknowledged.</li>
+        <li>Close socket.</li>
+        <li>Stop.</li>
+      </ol>
+
+      <h3>Algorithm – Receiver</h3>
+      <ol>
+        <li>Start.</li>
+        <li>Create and bind UDP socket.</li>
+        <li>Maintain window of expected sequence numbers.</li>
+        <li>Receive frame:
+          <ul>
+            <li>If within window → store and send ACK for that frame.</li>
+            <li>If duplicate → resend ACK.</li>
+          </ul>
+        </li>
+        <li>Deliver frames to application in order.</li>
+        <li>Slide window forward as consecutive frames are delivered.</li>
+        <li>Repeat until all frames are received.</li>
+        <li>Close socket.</li>
+        <li>Stop.</li>
+      </ol>
+    </section>
+
+    <section id="functions" class="card">
+      <h2>⚙️ Important Functions</h2>
+      <table aria-label="Important socket functions">
+        <thead>
+          <tr>
+            <th>Function</th>
+            <th>Purpose</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td><code>socket()</code></td><td>Creates communication endpoint</td></tr>
+          <tr><td><code>bind()</code></td><td>Assigns IP address and port to socket</td></tr>
+          <tr><td><code>listen()</code></td><td>Prepares server socket for connections</td></tr>
+          <tr><td><code>accept()</code></td><td>Accepts incoming client connection</td></tr>
+          <tr><td><code>connect()</code></td><td>Establishes client connection to server</td></tr>
+          <tr><td><code>send() / recv()</code></td><td>Send/receive data over TCP</td></tr>
+          <tr><td><code>sendto() / recvfrom()</code></td><td>Send/receive data over UDP</td></tr>
+          <tr><td><code>close()</code></td><td>Closes socket connection</td></tr>
+          <tr><td><code>setsockopt()</code></td><td>Set socket options (timeouts, reuse, etc.)</td></tr>
+          <tr><td><code>htons() / htonl()</code></td><td>Convert to network byte order</td></tr>
+          <tr><td><code>inet_pton() / inet_ntoa()</code></td><td>Convert between text and binary IP</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="keypoints" class="card">
+      <h2>🔑 Key Points</h2>
+
+      <h3>TCP</h3>
       <ul>
-        <li>If ACK received and correct → toggle sequence number and send next frame.</li>
-        <li>If timeout or wrong ACK → retransmit the same frame.</li>
+        <li>Connection-oriented and reliable.</li>
+        <li>Uses 3-way handshake.</li>
+        <li>Ensures ordered and error-free delivery.</li>
+        <li>Server: <code class="inline">listen()</code> and <code class="inline">accept()</code>.</li>
+        <li>Client: <code class="inline">connect()</code>.</li>
       </ul>
-    </li>
-    <li>Repeat until all frames are sent.</li>
-    <li>Close socket.</li>
-    <li>Stop.</li>
-  </ol>
 
-  <h3>Algorithm – Receiver</h3>
-  <ol>
-    <li>Start.</li>
-    <li>Create UDP socket and bind it.</li>
-    <li>Wait for data frame using <code>recvfrom()</code>.</li>
-    <li>If received frame has expected sequence number →
+      <h3>UDP</h3>
       <ul>
-        <li>Display data.</li>
-        <li>Send ACK for that sequence number.</li>
-        <li>Toggle expected sequence number.</li>
+        <li>Connectionless, faster but unreliable.</li>
+        <li>No handshake or guaranteed delivery.</li>
+        <li>Independent datagrams, best effort.</li>
       </ul>
-    </li>
-    <li>Else (duplicate frame) → resend previous ACK.</li>
-    <li>Repeat until all frames are received.</li>
-    <li>Close socket.</li>
-    <li>Stop.</li>
-  </ol>
 
-  <hr>
+      <h3>Stop-and-Wait</h3>
+      <ul>
+        <li>One frame at a time; wait for ACK.</li>
+        <li>Retransmit on timeout.</li>
+        <li>Sequence numbers alternate (0 &amp; 1).</li>
+      </ul>
 
-  <h2>⚙️ Important Functions</h2>
-  <table>
-    <tr><th>Function</th><th>Purpose</th></tr>
-    <tr><td><code>socket()</code></td><td>Creates communication endpoint</td></tr>
-    <tr><td><code>bind()</code></td><td>Assigns IP address and port to socket</td></tr>
-    <tr><td><code>listen()</code></td><td>Prepares server socket for connections</td></tr>
-    <tr><td><code>accept()</code></td><td>Accepts incoming client connection</td></tr>
-    <tr><td><code>connect()</code></td><td>Establishes client connection to server</td></tr>
-    <tr><td><code>send()</code> / <code>recv()</code></td><td>Send/receive data over TCP</td></tr>
-    <tr><td><code>sendto()</code> / <code>recvfrom()</code></td><td>Send/receive data over UDP</td></tr>
-    <tr><td><code>close()</code></td><td>Closes socket connection</td></tr>
-    <tr><td><code>setsockopt()</code></td><td>Set socket options (timeouts, reuse, etc.)</td></tr>
-    <tr><td><code>htons()</code> / <code>htonl()</code></td><td>Convert to network byte order</td></tr>
-    <tr><td><code>inet_pton()</code> / <code>inet_ntoa()</code></td><td>Convert between text and binary IP</td></tr>
-  </table>
+      <h3>Go-Back-N</h3>
+      <ul>
+        <li>Sends multiple frames (window size N).</li>
+        <li>Retransmits all unacknowledged frames on timeout.</li>
+        <li>Receiver only accepts in-order frames.</li>
+      </ul>
 
-  <hr>
+      <h3>Selective Repeat</h3>
+      <ul>
+        <li>Both sides maintain sliding windows.</li>
+        <li>Only erroneous frames retransmitted.</li>
+        <li>Receiver buffers out-of-order frames.</li>
+      </ul>
+    </section>
 
-  <h2>🧠 Common Header Files</h2>
-  <pre><code>#include &lt;stdio.h&gt;
+    <section id="headers" class="card">
+      <h2>🧠 Common Header Files</h2>
+      <pre><code>
+#include &lt;stdio.h&gt;
 #include &lt;stdlib.h&gt;
 #include &lt;string.h&gt;
 #include &lt;unistd.h&gt;
 #include &lt;arpa/inet.h&gt;
-#include &lt;time.h&gt;</code></pre>
+#include &lt;time.h&gt;
+      </code></pre>
+    </section>
+
+    <div class="footer">
+      <div>Made for <strong>Computer Networks Lab</strong> — Socket Programming in C</div>
+      <div>Tip: paste this README into a repo and link this page as documentation.</div>
+    </div>
+  </div>
 </body>
 </html>
