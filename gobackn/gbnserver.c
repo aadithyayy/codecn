@@ -7,6 +7,7 @@
 
 #define PORT 8080
 #define BUFFER_SIZE 1024
+#define LOSS_PROBABILITY 30 // 30% chance of ACK loss
 
 int main()
 {
@@ -14,7 +15,7 @@ int main()
     struct sockaddr_in address;
     int addrlen = sizeof(address);
     char buffer[BUFFER_SIZE] = {0};
-    int ack_prob = 70; // 70% chance of sending ACK
+    int ack;
 
     srand(time(0)); // Random seed for ACK simulation
 
@@ -25,19 +26,18 @@ int main()
         exit(EXIT_FAILURE);
     }
 
-    // Define server address
     address.sin_family = AF_INET;
     address.sin_addr.s_addr = INADDR_ANY;
     address.sin_port = htons(PORT);
 
-    // Bind socket to port
+    // Bind socket
     if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0)
     {
         perror("Bind failed");
         exit(EXIT_FAILURE);
     }
 
-    // Listen for incoming connections
+    // Listen for client
     if (listen(server_fd, 3) < 0)
     {
         perror("Listen failed");
@@ -46,7 +46,6 @@ int main()
 
     printf("Server: Waiting for connection...\n");
 
-    // Accept connection from client
     if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&addrlen)) < 0)
     {
         perror("Accept failed");
@@ -57,25 +56,27 @@ int main()
 
     while (1)
     {
-        // Receive packet from client
+        memset(buffer, 0, BUFFER_SIZE);
         int valread = read(new_socket, buffer, BUFFER_SIZE);
         if (valread == 0)
             break;
 
-        printf("Server: Received packet - %s\n", buffer);
+        ack = atoi(buffer);
+        printf("Server: Received packet %d\n", ack);
 
-        // Simulate ACK or loss
-        if (rand() % 100 < ack_prob)
+        // Simulate ACK loss
+        if (rand() % 100 < LOSS_PROBABILITY)
         {
-            printf("Server: ACK sent for packet %s\n\n", buffer);
-            send(new_socket, "ACK", strlen("ACK"), 0);
+            printf("Server: ACK for packet %d lost!\n\n", ack);
         }
         else
         {
-            printf("Server: ACK lost for packet %s\n\n", buffer);
+            sleep(1); // Simulate processing delay
+            printf("Server: ACK sent for packet %d\n\n", ack);
+            memset(buffer, 0, BUFFER_SIZE);
+            sprintf(buffer, "%d", ack); // Send ACK
+            send(new_socket, buffer, strlen(buffer) + 1, 0);
         }
-
-        memset(buffer, 0, BUFFER_SIZE); // Clear buffer
     }
 
     close(new_socket);
