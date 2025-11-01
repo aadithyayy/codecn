@@ -1,66 +1,69 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
+#include <string.h>
 #include <arpa/inet.h>
 
-#define PORT 8080
-#define TOTAL_FRAMES 5
+#define PORT 12345
+#define LOCALHOST "127.0.0.1"
+
+typedef struct
+{
+    int fnum;
+    char data[30];
+} Frame;
+
+typedef struct
+{
+    int anum;
+} Ack;
 
 int main()
 {
-    int sockfd;
-    struct sockaddr_in serv, snd;
-    socklen_t len = sizeof(snd);
-    char buffer[1024], ack[10];
-    int received[TOTAL_FRAMES] = {0};
-    int dropped_once = 0; // track if frame 3 was dropped
+    int sock;
+    struct sockaddr_in serveraddr, clientaddr;
+    socklen_t addr_len = sizeof(clientaddr);
+    Frame f;
+    Ack a;
+    int expected[10] = {0}; // buffer for received frames
+    int drop3 = 0;
 
-    sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-    serv.sin_family = AF_INET;
-    serv.sin_port = htons(PORT);
-    serv.sin_addr.s_addr = INADDR_ANY;
+    sock = socket(AF_INET, SOCK_DGRAM, 0);
+    serveraddr.sin_family = AF_INET;
+    serveraddr.sin_port = htons(PORT);
+    serveraddr.sin_addr.s_addr = inet_addr(LOCALHOST);
 
-    bind(sockfd, (struct sockaddr *)&serv, sizeof(serv));
-    printf("Selective Repeat ARQ Simulation (Receiver)\n");
+    bind(sock, (struct sockaddr *)&serveraddr, sizeof(serveraddr));
 
-    while (1)
+    printf("\n--- SELECTIVE REPEAT ARQ (RECIEVER) ---\n\n");
+
+    int count = 1;
+    while (count <= 10)
     {
-        recvfrom(sockfd, buffer, sizeof(buffer), 0, (struct sockaddr *)&snd, &len);
-        int no = buffer[6] - '1'; // Extract frame number from "Frame X"
-        printf("Received: %s\n", buffer);
+        int n = recvfrom(sock, &f, sizeof(f), 0, (struct sockaddr *)&clientaddr, &addr_len);
+        if (n <= 0)
+            continue;
 
-        // Drop Frame 3 only once
-        if (no == 2 && !dropped_once)
+        printf("[S] Frame %d received.\n", f.fnum);
+
+        // Simulate loss of Frame 3
+        if (f.fnum == 4 && drop3 == 0)
         {
-            printf("Dropping Frame %d intentionally (once)\n", no + 1);
-            dropped_once = 1;
+            printf("[S] Frame %d lost (no ACK sent).\n", f.fnum);
+            drop3 = 1;
             continue;
         }
 
-        if (!received[no])
-        {
-            received[no] = 1;
-            sprintf(ack, "%d", no);
-            sendto(sockfd, ack, strlen(ack) + 1, 0, (struct sockaddr *)&snd, len);
-            printf("Sent ACK for Frame %d\n", no + 1);
-        }
-
-        // Check if all frames received
-        int all_received = 1;
-        for (int i = 0; i < TOTAL_FRAMES; i++)
-        {
-            if (!received[i])
-            {
-                all_received = 0;
-                break;
-            }
-        }
-        if (all_received)
-            break;
+        // Accept and ACK the frame
+        expected[f.fnum] = 1;
+        a.anum = f.fnum;
+        sendto(sock, &a, sizeof(a), 0, (struct sockaddr *)&clientaddr, addr_len);
+        printf("[S] ACK %d sent.\n", a.anum);
+        count++;
+        sleep(1);
     }
 
-    printf("\nAll frames received successfully!\n");
-    close(sockfd);
+    printf("\n[S] All frames received successfully!\n");
+    close(sock);
     return 0;
 }
